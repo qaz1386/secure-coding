@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ target.username }}님과 채팅{% endblock %}
+{% block content %}
+<h2>{{ target.username }}님과 1:1 채팅</h2>
+
+<ul id="chat_messages">
+  {% for msg in messages %}
+    <li><strong>{{ '나' if msg.from_id == session['user_id'] else target.username }}:</strong> {{ msg.content }}</li>
+  {% endfor %}
+</ul>
+
+<input type="text" id="chat_input" placeholder="메시지를 입력하세요">
+<button onclick="send()">전송</button>
+
+<script>
+  const socket = io();
+  const myId = "{{ session['user_id'] }}";
+  const targetId = "{{ target.id }}";
+  const room = [myId, targetId].sort().join("-");
+
+  socket.emit('join_room', { room: room });
+
+  socket.on('receive_message', function(data) {
+    const list = document.getElementById('chat_messages');
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${data.from_id === myId ? "나" : "{{ target.username }}"}:</strong> ${data.message}`;
+    list.appendChild(li);
+  });
+
+  function send() {
+    const input = document.getElementById('chat_input');
+    const message = input.value;
+    if (message) {
+      socket.emit('private_message', {
+        room: room,
+        from_id: myId,
+        to_id: targetId,
+        message: message
+      });
+      input.value = "";
+    }
+  }
+</script>
+{% endblock %}

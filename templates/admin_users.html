@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}관리자 - 유저 관리{% endblock %}
+{% block content %}
+<h2>유저 관리</h2>
+<table>
+  <tr>
+    <th>아이디</th><th>사용자명</th><th>관리자</th><th>상태</th><th>제어</th>
+  </tr>
+  {% for user in users %}
+  <tr>
+    <td>{{ user.id }}</td>
+    <td>{{ user.username }}</td>
+    <td>{{ '✔' if user.is_admin else '❌' }}</td>
+    <td>{{ '활성' if user.is_active else '정지' }}</td>
+    <td>
+      {% if not user.is_admin %}
+      <form method="post" action="{{ url_for('toggle_user', user_id=user.id) }}">
+        <button type="submit">{{ '정지시키기' if user.is_active else '활성화하기' }}</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

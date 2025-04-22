@@ -5,4 +5,11 @@
 <p>{{ product.description }}</p>
 <p>가격: {{ product.price }}</p>
 <p>판매자: {{ seller.username if seller else '알 수 없음' }}</p>
+{% if user.id == product.seller_id or session.get('is_admin') == 1 %}
+  <a href="{{ url_for('edit_product', product_id=product.id) }}">✏️ 수정</a>
+  <form method="post" action="{{ url_for('delete_product', product_id=product.id) }}" style="display:inline;">
+    <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?')">🗑 삭제</button>
+  </form>
+{% endif %}
 {% endblock %}
+
