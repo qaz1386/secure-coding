@@ -4,11 +4,15 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_socketio import SocketIO, send, emit, join_room
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+from flask_wtf.csrf import CSRFProtect
+import re
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 DATABASE = 'market.db'
 socketio = SocketIO(app)
+csrf = CSRFProtect(app)
+
 
 def admin_required(f):
     @wraps(f)
@@ -201,6 +205,9 @@ def register():
         if cursor.fetchone() is not None:
             flash('이미 존재하는 사용자명입니다.')
             return redirect(url_for('register'))
+        if len(password) < 8 or not re.search(r"\d", password) or not re.search(r"\W", password):
+            flash('비밀번호는 8자 이상, 숫자 및 특수문자를 포함해야 합니다.')
+            return redirect(url_for('register'))
         user_id = str(uuid.uuid4())
         hashed_pw = generate_password_hash(password)
         is_admin = 1 if username == 'master' else 0
@@ -222,6 +229,7 @@ def login():
         cursor.execute("SELECT * FROM user WHERE username = ?", (username,))
         user = cursor.fetchone()
         if user and check_password_hash(user['password'], password):
+            session.clear()
             session['user_id'] = user['id']
             session['is_admin'] = user['is_admin']
             flash('로그인 성공!')

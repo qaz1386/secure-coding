@@ -3,6 +3,7 @@
 {% block content %}
 <h2>회원가입</h2>
 <form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   사용자명: <input type="text" name="username" required><br>
   비밀번호: <input type="password" name="password" required><br>
   <small>※ 비밀번호는 최소 8자 이상이며 숫자와 특수문자를 포함해야 합니다.</small><br><br>

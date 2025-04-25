@@ -9,3 +9,4 @@ dependencies:
     - flask-socketio
     - flask-sqlalchemy
     - werkzeug
+    - flask_wtf

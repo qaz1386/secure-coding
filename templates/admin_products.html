@@ -11,6 +11,8 @@
     <td>{{ p.username|e }}</td>
     <td>
       <form method="post" action="{{ url_for('delete_product', product_id=p.id) }}" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <button type="submit">삭제</button>
       </form>
     </td>

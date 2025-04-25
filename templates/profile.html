@@ -5,6 +5,8 @@
 <h2>프로필 관리</h2>
 
 <form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
   <p><strong>사용자명:</strong> {{ user.username|e }}</p>
 
   <label for="bio">소개글:</label><br>

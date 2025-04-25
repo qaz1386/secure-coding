@@ -15,6 +15,8 @@
     <td>
       {% if not user.is_admin %}
       <form method="post" action="{{ url_for('toggle_user', user_id=user.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <button type="submit">{{ '정지시키기' if user.is_active else '활성화하기' }}</button>
       </form>
       {% endif %}
