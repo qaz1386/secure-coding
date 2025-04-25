@@ -4,11 +4,14 @@
 <h2>상품 수정</h2>
 <form method="post">
   <label>제목:</label><br>
-  <input type="text" name="title" value="{{ product.title }}" required><br><br>
+  <input type="text" name="title" value="{{ product.title|e }}" required><br><br>
+
   <label>설명:</label><br>
-  <textarea name="description" required>{{ product.description }}</textarea><br><br>
+  <textarea name="description" required>{{ product.description|e }}</textarea><br><br>
+
   <label>가격:</label><br>
-  <input type="text" name="price" value="{{ product.price }}" required><br><br>
+  <input type="text" name="price" value="{{ product.price|e }}" required><br><br>
+
   <button type="submit">수정 완료</button>
 </form>
 {% endblock %}

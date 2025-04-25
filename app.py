@@ -75,7 +75,9 @@ def init_db():
                 password TEXT NOT NULL,
                 bio TEXT,
                 is_admin INTEGER DEFAULT 0,
-                is_active INTEGER DEFAULT 1
+                is_active INTEGER DEFAULT 1,
+                balance INTEGER DEFAULT 0,
+                bank_account TEXT DEFAULT ''
             )
         """)
         # 상품 테이블 생성
@@ -85,7 +87,8 @@ def init_db():
                 title TEXT NOT NULL,
                 description TEXT NOT NULL,
                 price TEXT NOT NULL,
-                seller_id TEXT NOT NULL
+                seller_id TEXT NOT NULL,
+                status TEXT DEFAULT '판매중'
             )
         """)
         # 신고 테이블 생성
@@ -332,7 +335,8 @@ def profile():
     cursor = db.cursor()
     if request.method == 'POST':
         bio = request.form.get('bio', '')
-        cursor.execute("UPDATE user SET bio = ? WHERE id = ?", (bio, session['user_id']))
+        bank_account = request.form.get('bank_account', '')
+        cursor.execute("UPDATE user SET bio = ?, bank_account = ? WHERE id = ?", (bio, bank_account, session['user_id']))
         db.commit()
         flash('프로필이 업데이트되었습니다.')
         return redirect(url_for('profile'))
@@ -396,6 +400,63 @@ def edit_product(product_id):
         return redirect(url_for('dashboard'))
 
     return render_template('edit_product.html', product=product)
+
+@app.route('/product/<product_id>/confirm', methods=['POST'])
+def confirm_payment(product_id):
+    if 'user_id' not in session:
+        flash('로그인이 필요합니다.')
+        return redirect(url_for('login'))
+
+    db = get_db()
+    cursor = db.cursor()
+
+    # 상품 정보 가져오기
+    cursor.execute("SELECT * FROM product WHERE id = ?", (product_id,))
+    product = cursor.fetchone()
+
+    if not product:
+        flash("상품을 찾을 수 없습니다.")
+        return redirect(url_for('dashboard'))
+
+    # 이미 거래 완료 상태면 차단
+    if product['status'] == '거래완료':
+        flash("이 상품은 이미 거래가 완료되었습니다.")
+        return redirect(url_for('view_product', product_id=product_id))
+
+    # 상태 변경
+    cursor.execute("UPDATE product SET status = '거래완료' WHERE id = ?", (product_id,))
+    db.commit()
+
+    flash('입금 완료가 확인되었습니다. 거래가 완료 처리되었습니다.')
+    return redirect(url_for('dashboard'))
+
+@app.route('/product/<product_id>/start', methods=['POST'])
+def start_transaction(product_id):
+    if 'user_id' not in session:
+        flash('로그인이 필요합니다.')
+        return redirect(url_for('login'))
+
+    db = get_db()
+    cursor = db.cursor()
+
+    # 판매자가 본인 상품에 거래 시작 못하게 제한
+    cursor.execute("SELECT seller_id, status FROM product WHERE id = ?", (product_id,))
+    product = cursor.fetchone()
+    if not product:
+        flash('상품을 찾을 수 없습니다.')
+        return redirect(url_for('dashboard'))
+    if product['seller_id'] == session['user_id']:
+        flash('자신의 상품에 거래를 시작할 수 없습니다.')
+        return redirect(url_for('dashboard'))
+    if product['status'] != '판매중':
+        flash('이미 거래가 시작된 상품입니다.')
+        return redirect(url_for('dashboard'))
+
+    cursor.execute("UPDATE product SET status = '거래중' WHERE id = ?", (product_id,))
+    db.commit()
+    flash('거래를 시작했습니다. 입금 후 판매자에게 알려주세요.')
+    return redirect(url_for('view_product', product_id=product_id))
+
 
 # 상품 상세보기
 @app.route('/product/<product_id>')

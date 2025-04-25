@@ -6,9 +6,9 @@
   <tr><th>제목</th><th>가격</th><th>판매자</th><th>조작</th></tr>
   {% for p in products %}
   <tr>
-    <td>{{ p.title }}</td>
-    <td>{{ p.price }}</td>
-    <td>{{ p.username }}</td>
+    <td>{{ p.title|e }}</td>
+    <td>{{ p.price|e }}</td>
+    <td>{{ p.username|e }}</td>
     <td>
       <form method="post" action="{{ url_for('delete_product', product_id=p.id) }}" style="display:inline;">
         <button type="submit">삭제</button>

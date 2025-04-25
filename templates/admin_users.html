@@ -8,8 +8,8 @@
   </tr>
   {% for user in users %}
   <tr>
-    <td>{{ user.id }}</td>
-    <td>{{ user.username }}</td>
+    <td>{{ user.id|e }}</td>
+    <td>{{ user.username|e }}</td>
     <td>{{ '✔' if user.is_admin else '❌' }}</td>
     <td>{{ '활성' if user.is_active else '정지' }}</td>
     <td>

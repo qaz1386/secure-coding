@@ -4,15 +4,15 @@
 <h2>사용자 목록</h2>
 
 <form method="get" action="{{ url_for('user_list') }}">
-  <input type="text" name="q" placeholder="사용자명 검색" value="{{ query or '' }}">
+  <input type="text" name="q" placeholder="사용자명 검색" value="{{ query|e or '' }}">
   <button type="submit">검색</button>
 </form>
 
 <ul>
   {% for user in users %}
     <li>
-      <strong>{{ user.username }}</strong> - {{ user.bio or '소개 없음' }}
-      | <a href="{{ url_for('private_chat', username=user.username) }}">채팅하기</a>
+      <strong>{{ user.username|e }}</strong> - {{ user.bio|e or '소개 없음' }}
+      | <a href="{{ url_for('private_chat', username=user.username|e) }}">채팅하기</a>
     </li>
   {% else %}
     <li>검색 결과가 없습니다.</li>

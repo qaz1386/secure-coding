@@ -1,17 +1,25 @@
 {% extends "base.html" %}
 {% block title %}프로필{% endblock %}
 {% block content %}
+
 <h2>프로필 관리</h2>
 
 <form method="post">
-  <p>사용자명: {{ user.username }}</p>
-  <label>소개글:</label><br>
-  <textarea name="bio" rows="4" cols="50">{{ user.bio or '' }}</textarea><br>
+  <p><strong>사용자명:</strong> {{ user.username|e }}</p>
+
+  <label for="bio">소개글:</label><br>
+  <textarea id="bio" name="bio" rows="4" cols="50">{{ (user.bio or '')|e }}</textarea><br><br>
+
+  <label for="bank_account">입금 계좌번호:</label><br>
+  <input id="bank_account" type="text" name="bank_account" value="{{ (user.bank_account or '')|e }}" required><br><br>
+
   <button type="submit">프로필 업데이트</button>
 </form>
 
 <hr>
+
 <form method="get" action="{{ url_for('change_password') }}">
   <button type="submit">비밀번호 변경</button>
 </form>
+
 {% endblock %}

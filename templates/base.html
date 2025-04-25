@@ -106,7 +106,7 @@
       {% if messages %}
         <ul>
           {% for message in messages %}
-            <li class="flash">{{ message }}</li>
+            <li class="flash">{{ message|e }}</li>
           {% endfor %}
         </ul>
       {% endif %}
